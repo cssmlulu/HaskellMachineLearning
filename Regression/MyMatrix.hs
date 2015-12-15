@@ -1,13 +1,12 @@
 module MyMatrix (
-    MyMatrix.Matrix,
-    fromLists,
-    toLists,
-    (<>),
-    inv,    -- invariant Matrix
-    trans   -- transpose Matrix
+    MyMatrix,
+    sumRows,
+    sumColumns
     ) where
 
-import Data.Packed.Matrix (trans) 
-import Numeric.LinearAlgebra.HMatrix as HM (Matrix,fromLists,toLists, inv, (<>))
 
-type Matrix = HM.Matrix Double
+import Numeric.LinearAlgebra
+type MyMatrix = Matrix Double
+
+sumRows m = fromColumns $ [ sum $ toColumns m ]
+sumColumns m = fromRows $ [ sum $ toRows m ]
