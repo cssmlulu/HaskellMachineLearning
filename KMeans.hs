@@ -1,21 +1,27 @@
 import qualified Data.Map as M
 import qualified Data.List as L
+import qualified Data.Vector as V
 
-type Point = [Double]
+type Point = V.Vector Double
 type Points = [Point]
-type Cluster = [Point]
-type Clusters = [Cluster]
+type Clusters = [Cluster (V.Vector Double)]
 type Center = Point
 type Centers = [Point]
 
+type Distance = V.Vector Double -> V.Vector Double -> Double
 -- distance between two points
-dist :: Point -> Point -> Double
-dist a b = sqrt $ sum (zipWith (\x y -> (x-y)^2) a b)
+dist :: Distance
+dist a b = sqrt $ V.sum (V.zipWith (\x y -> (x-y)^2) a b)
+
+-- a cluster is a list of points
+newtype Cluster a = Cluster { points :: [a] } deriving (Eq, Show)
+
 
 -- calculate a cluster's center
-center :: Cluster -> Center 
-center cluster = map (flip (/) r) l
-    where (l,r) = foldl (\(x,n) y -> (zipWith (+) x y,n+1)) (replicate (length $ cluster !! 0) 0.0, 0) cluster
+center :: Cluster (V.Vector Double) -> Center 
+center cluster = V.fromList $ map (flip (/) r) l
+    where (l,r) = foldl (\(x,n) y -> (zipWith (+) x y,n+1)) (replicate (length $ cluster' !! 0) 0.0, 0) cluster'
+          cluster' = map V.toList $ points cluster
 
 -- input clusters and output centers
 calCenters :: Clusters -> Centers
@@ -26,8 +32,8 @@ initCenters :: Int -> Points -> Centers
 initCenters k points = take k points
 
 -- assgin each point to its nearest center
-assignToCenters :: Centers -> Points -> M.Map Center Points
-assignToCenters centers points =  centerMapPoints
+assignToCenters :: Centers -> Points -> M.Map Center (Cluster (V.Vector Double))
+assignToCenters centers points =  M.map Cluster centerMapPoints
     where 
         pair = map nearest points
         centerMapPoints = M.fromListWith (++) $ map (\(k,v) -> (k,[v])) pair
