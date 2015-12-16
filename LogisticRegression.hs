@@ -1,7 +1,20 @@
 module LogisticRegression where
 import Numeric.LinearAlgebra
 import MyMatrix
-import GradientDescent
+import Utils
+
+data LogisticRegression = LogisticR MyMatrix deriving Show
+
+instance Predicter LogisticRegression where
+  predict (LogisticR theta) x = sigmoid $ x <> theta
+  fit x y = LogisticR $ logisticRegressionGDTrain x y initial_theta alpha num_iters lambda
+    where
+      initial_theta = fromLists [[2],[5]]
+      alpha = 0.01
+      num_iters = 1000::Int
+      lambda = 0.1
+
+
 
 sigmoid x = 1.0/ ( 1 + exp(-x) )
 

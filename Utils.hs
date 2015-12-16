@@ -1,4 +1,4 @@
-module GradientDescent where
+module Utils where
 import MyMatrix
 import Numeric.LinearAlgebra
 --  update theta by taking num_iters gradient steps with learning rate alpha
@@ -8,3 +8,7 @@ gradientDescent gradFunc initialTheta alpha num_iters = iterate initialTheta num
                 iterate theta 0 = theta
                 iterate theta iters = iterate (updateTheta theta) (iters-1)
                 updateTheta t = t - (scalar alpha) * (gradFunc t)
+
+class Predicter a where
+    predict :: a -> MyMatrix -> MyMatrix
+    fit :: MyMatrix -> MyMatrix -> a

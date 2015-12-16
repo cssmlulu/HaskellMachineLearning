@@ -4,7 +4,14 @@ module LinearRegression(
     ) where
 import Numeric.LinearAlgebra
 import MyMatrix
-import GradientDescent
+import Utils
+
+data LinearRegression = LinearR MyMatrix deriving Show
+
+instance Predicter LinearRegression where
+  predict (LinearR theta) x = x <> theta
+  fit x y = LinearR $ linearRegressionNETrain x y
+
 
 -- input xtrain and ytrain to learn the paramter theta
 -- Normal Equation method: theta = (X^TX)^-1X^Ty 
