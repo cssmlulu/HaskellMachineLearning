@@ -1,7 +1,5 @@
 module MyMatrix (
-    MyMatrix,
-    sumRows,
-    sumColumns
+    module MyMatrix
     ) where
 
 

@@ -1,3 +1,4 @@
+module LinearRegression where
 import Numeric.LinearAlgebra
 import MyMatrix
 
@@ -20,20 +21,24 @@ gradientDescent gradFunc initialTheta alpha num_iters = iterate initialTheta num
                 iterate theta iters = iterate (updateTheta theta) (iters-1)
                 updateTheta t = t - (scalar alpha) * (gradFunc t)
 
--- Compute regularized cost  using theta as the parameter for linear regression
--- Returns a pair of cost and final theta
-computeCost :: MyMatrix -> MyMatrix -> MyMatrix -> Double -> (Double, MyMatrix)
-computeCost x y theta lambda = (cost, gradient)
+-- Compute regularized cost using theta as the parameter for linear regression
+computeCost :: MyMatrix -> MyMatrix -> MyMatrix -> Double -> Double
+computeCost x y theta lambda = ( 1/(2*m) ) * sumElements (((x <> theta) - y) ^2 ) + (lambda/(2*m)) * sumElements (tempTheta ^ 2)
     where
       m = fromIntegral $ rows y
       tempTheta = accum theta (*) [((0,0),0)]
-      cost = ( 1/(2*m) ) * sumElements (((x <> theta) - y) ^2 ) + (lambda/(2*m)) * sumElements (tempTheta ^ 2)
-      gradient = ctrans $ (scalar (1/m)) * ( sumColumns  ((x <> theta - y) * x) ) + (scalar (lambda/m)) * (ctrans tempTheta)
+
+-- Compute gredient using theta as the parameter for linear regression
+computeGradient :: MyMatrix -> MyMatrix -> MyMatrix -> Double -> MyMatrix
+computeGradient x y theta lambda = ctrans $ (scalar (1/m)) * ( sumColumns  ((x <> theta - y) * x) ) + (scalar (lambda/m)) * (ctrans tempTheta)
+    where
+      m = fromIntegral $ rows y
+      tempTheta = accum theta (*) [((0,0),0)]
 
 -- input xtrain and ytrain to learn the paramter theta
 -- using gradient descent
 linearRegressionGDTrain :: MyMatrix -> MyMatrix -> MyMatrix -> Double -> Int -> Double -> MyMatrix
 linearRegressionGDTrain x y theta0 alpha num_iters lambda = gradientDescent gradFunc theta0 alpha num_iters
     where
-      gradFunc t = snd (computeCost x y t lambda)
+      gradFunc t = computeGradient x y t lambda
 
