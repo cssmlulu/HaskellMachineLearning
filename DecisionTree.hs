@@ -2,8 +2,17 @@ import MyMatrix
 
 import qualified Data.List as L
 import qualified Data.Map as M
-import Control.Arrow
-import Control.Monad
+import Numeric.LinearAlgebra as LA
+import Control.Arrow 
+import qualified Control.Monad as Monad
+
+listToMatrix l = LA.asColumn $ LA.fromList l 
+matrixTolist m = head $ LA.toColumns m
+buildSample x y = zip y' x'
+  where
+    x' = map toList (toRows x)
+    y' = map (head.toList) (toRows y)
+
 
 data DecisionTree = Node Int Double (DecisionTree) (DecisionTree) | Leaf [(Double, Double)]
     deriving Show
@@ -11,16 +20,16 @@ data DecisionTree = Node Int Double (DecisionTree) (DecisionTree) | Leaf [(Doubl
 type Samples = [(Double, [Double])]
 
 class Predicter a where
-    predict :: a -> [Double] -> Double
-    fit :: Samples -> a
+    predict :: a -> MyMatrix -> MyMatrix
+    fit :: MyMatrix -> MyMatrix -> a
 
 instance Predicter DecisionTree where
     predict tree x_test = dtPredict tree x_test
-    fit samples = buildTree samples
+    fit x y  = buildTree $ buildSample x y
 
 -- divide samples to two subtree by ith feature & its threshold
-divide :: Samples -> Int -> Double -> (Samples, Samples)
-divide samples featureIdx thr = L.partition ((>= thr) . (flip (!!) featureIdx) . snd) samples
+treeDivide :: Samples -> Int -> Double -> (Samples, Samples)
+treeDivide samples featureIdx thr = L.partition ((>= thr) . (flip (!!) featureIdx) . snd) samples
 
 -- Gini(p) = sum(pi*(1-pi)) = 1 - sum(pi^2)
 gini :: [Double] -> Double
@@ -43,7 +52,7 @@ findBestThr featureIdxes samples = L.maximumBy (\(x,_,_) (y,_,_) -> compare x y)
         h = gini . computeFreq . map snd . countElem
         labels = map fst samples
         pairs = [(i, (snd s) !! i) | i <- featureIdxes, s <- samples]
-        computeGainOfDivide i thr = uncurry (commonGain h labels) . join (***) (map fst) $ divide samples i thr
+        computeGainOfDivide i thr = uncurry (commonGain h labels) . Monad.join (***) (map fst) $ treeDivide samples i thr
         genProps = map (\(i, thr) -> (computeGainOfDivide i thr, i, thr)) pairs
         commonGain h s s1 s2 = h s - (l1/l) * h s1 - (l2/l) * h s2
             where 
@@ -54,14 +63,18 @@ findBestThr featureIdxes samples = L.maximumBy (\(x,_,_) (y,_,_) -> compare x y)
 --build decision tree
 buildTree :: Samples-> DecisionTree
 buildTree samples
-    | bestGain > 0 = let (r, l) = divide samples featureIdx thr in Node featureIdx thr (buildTree l) (buildTree r)
+    | bestGain > 0 = let (r, l) = treeDivide samples featureIdx thr in Node featureIdx thr (buildTree l) (buildTree r)
     | otherwise = Leaf . countElem . map fst $ samples
     where 
         (bestGain, featureIdx, thr) = findBestThr [0..length (snd $ samples !! 0) - 1] samples
 
---sue decision tree to predict
-dtPredict :: DecisionTree  -> [Double] -> Double
-dtPredict (Leaf vals) _ = fst . L.maximumBy (\x y -> compare (snd x) (snd y)) $ vals
-dtPredict (Node featureIdx thr l r) features
-    | features !! featureIdx >= thr = dtPredict r features
-    | otherwise               = dtPredict l features
+--use decision tree to predict
+dtPredict :: DecisionTree  -> MyMatrix -> MyMatrix
+dtPredict tree x = listToMatrix $ map (dtPredictSingle tree) (LA.toLists x)
+
+--predict for single sample
+dtPredictSingle :: DecisionTree  -> [Double] -> Double
+dtPredictSingle (Leaf vals) _ = fst . L.maximumBy (\x y -> compare (snd x) (snd y)) $ vals
+dtPredictSingle (Node featureIdx thr l r) features
+    | features !! featureIdx >= thr = dtPredictSingle r features
+    | otherwise               = dtPredictSingle l features
