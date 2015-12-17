@@ -1,4 +1,4 @@
-import MyMatrix
+import Utils
 
 import qualified Data.List as L
 import qualified Data.Map as M
@@ -6,22 +6,9 @@ import Numeric.LinearAlgebra as LA
 import Control.Arrow 
 import qualified Control.Monad as Monad
 
-listToMatrix l = LA.asColumn $ LA.fromList l 
-matrixTolist m = head $ LA.toColumns m
-buildSample x y = zip y' x'
-  where
-    x' = map toList (toRows x)
-    y' = map (head.toList) (toRows y)
-
 
 data DecisionTree = Node Int Double (DecisionTree) (DecisionTree) | Leaf [(Double, Double)]
     deriving Show
-
-type Samples = [(Double, [Double])]
-
-class Predicter a where
-    predict :: a -> MyMatrix -> MyMatrix
-    fit :: MyMatrix -> MyMatrix -> a
 
 instance Predicter DecisionTree where
     predict tree x_test = dtPredict tree x_test

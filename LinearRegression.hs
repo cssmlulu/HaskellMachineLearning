@@ -3,7 +3,6 @@ module LinearRegression(
     linearRegressionGDTrain
     ) where
 import Numeric.LinearAlgebra
-import MyMatrix
 import Utils
 
 data LinearRegression = LinearR MyMatrix deriving Show

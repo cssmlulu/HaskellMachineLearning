@@ -1,6 +1,5 @@
 module LogisticRegression where
 import Numeric.LinearAlgebra
-import MyMatrix
 import Utils
 
 data LogisticRegression = LogisticR MyMatrix deriving Show
