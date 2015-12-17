@@ -1,6 +1,7 @@
 module Main where
 import LinearRegression
 import PCA
+import KNN
 import Numeric.LinearAlgebra
 import Test.HUnit
 
@@ -31,9 +32,18 @@ testPCA = TestCase (do m <- loadMatrix "mnist.txt" -- fromFile "mnist.txt" (5000
                        let y' = fromList [-357.7685710646392,-687.2472126248036,-43.89815727620881,272.3317498278406,-154.99902552369008,71.43126250099931,60.65183348252385,374.7689711144638,257.5547336560461,211.72211078077007]
                        assertEqual "testPCA failed" y y')
 
+testKNN = TestCase (do let train = [(0,[1,2,3]),(1,[7,8,9]),(0,[2,1,1]),(0,[0,1,1]),(1,[7,8,8]),(1,[8,7,9]),(2,[2,3,1])]
+                       let test = [7,5,9]
+                       let k = 3
+                       let y = knn train test k
+                       let y' = 1.0::Double
+                       assertEqual "testKNN failed" y y')
+
+
 tests = TestList [TestLabel "testlinearRegressionNETrain" testlinearRegressionNETrain,
                   TestLabel "testlinearRegressionGDTrain" testlinearRegressionGDTrain,
-                  TestLabel "testPCA" testPCA]
+                  TestLabel "testPCA" testPCA,
+                  TestLabel "testKNN" testKNN]
 
 main = do
     runTestTT tests

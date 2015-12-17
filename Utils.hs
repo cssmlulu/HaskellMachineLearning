@@ -13,7 +13,8 @@ class Predicter a where
     predict :: a -> MyMatrix -> MyMatrix
     fit :: MyMatrix -> MyMatrix -> a
 
-type Samples = [(Double, [Double])]
+type Sample = (Double, [Double])
+type Samples = [Sample]
 type MyMatrix = Matrix Double
 type MyVector = Vector Double
 
@@ -26,3 +27,6 @@ buildSample x y = zip y' x'
   where
     x' = map toList (toRows x)
     y' = map (head.toList) (toRows y)
+
+dist :: [Double]->[Double]->Double
+dist p q = sqrt $   sum $ zipWith (\a b-> (a-b)*(a-b)) p q

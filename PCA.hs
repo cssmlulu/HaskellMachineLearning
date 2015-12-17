@@ -1,7 +1,7 @@
 -- Principal component analysis
 module PCA where
 import Numeric.LinearAlgebra
-import MyMatrix
+import Utils
 
 data PCAData = PCAData {means:: MyVector,
                         reduceMatrix :: MyMatrix} deriving Show
