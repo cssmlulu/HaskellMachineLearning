@@ -1,5 +1,8 @@
 module Main where
+import Utils
 import LinearRegression
+import LogisticRegression
+import DecisionTree
 import PCA
 import KNN
 import Numeric.LinearAlgebra
@@ -23,8 +26,22 @@ testlinearRegressionGDTrain = TestCase (do let x = fromLists [[1,4],[2,5],[5,1],
                                            let y'= x <> theta
                                            assertBool "testlinearRegressionGDTrain failed" ((abs $ sumElements (y-y')) < 0.1))
 
+testLogisticRegressionGDTrain = TestCase (do x <- loadMatrix "Data/train_data.txt"
+                                             y <- loadMatrix "Data/train_label.txt"
+                                             let lr = fit x y :: LogisticRegression
+                                             let x' = fromLists [[14.64,4.25,19.35,5.33,103]]
+                                             let y' = predict lr x'
+                                             assertEqual "testLogisticRegressionGDTrain failed" (signum . head . head $ toLists y') 1.0)
 
-testPCA = TestCase (do m <- loadMatrix "mnist.txt" -- fromFile "mnist.txt" (5000,785)
+testDecisionTreeTrain = TestCase (do x <- loadMatrix "Data/train_data.txt"
+                                     y <- loadMatrix "Data/train_label.txt"
+                                     let lr = fit x y :: DecisionTree
+                                     let x' = fromLists [[14.64,4.25,19.35,5.33,103]]
+                                     let y' = predict lr x'
+                                     assertEqual "tesDecisionTreeTrain failed" (signum . head . head $ toLists y') 0.0)
+
+
+testPCA = TestCase (do m <- loadMatrix "Data/mnist.txt" -- fromFile "mnist.txt" (5000,785)
                        let xs = takeColumns (cols m -1) m -- the last column is the digit type (class label)
                        let x = toRows xs !! 4  -- an arbitrary test Vec
                        let p = pca 10 xs
@@ -42,6 +59,8 @@ testKNN = TestCase (do let train = [(0,[1,2,3]),(1,[7,8,9]),(0,[2,1,1]),(0,[0,1,
 
 tests = TestList [TestLabel "testlinearRegressionNETrain" testlinearRegressionNETrain,
                   TestLabel "testlinearRegressionGDTrain" testlinearRegressionGDTrain,
+                  TestLabel "testLogisticRegressionGDTrain" testLogisticRegressionGDTrain,
+                  TestLabel "testDecisionTreeTrain" testDecisionTreeTrain,
                   TestLabel "testPCA" testPCA,
                   TestLabel "testKNN" testKNN]
 

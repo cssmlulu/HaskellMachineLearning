@@ -38,7 +38,3 @@ decode p x = x <> vp + m
   where
     vp = reduceMatrix p
     m = means p 
-
-
--- norm = pnorm PNorm2
--- print $ norm (x - decode p y) / norm x --reconstruction quality

@@ -8,9 +8,9 @@ instance Predicter LogisticRegression where
   predict (LogisticR theta) x = sigmoid $ x <> theta
   fit x y = LogisticR $ logisticRegressionGDTrain x y initial_theta alpha num_iters lambda
     where
-      initial_theta = fromLists [[2],[5]]
+      initial_theta = trans $ fromLists [take (cols x) (repeat 0.0)]
       alpha = 0.01
-      num_iters = 1000::Int
+      num_iters = 10000::Int
       lambda = 0.1
 
 

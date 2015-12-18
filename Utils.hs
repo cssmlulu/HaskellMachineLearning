@@ -21,8 +21,8 @@ type MyVector = Vector Double
 sumRows m = fromColumns $ [ sum $ toColumns m ]
 sumColumns m = fromRows $ [ sum $ toRows m ]
 
-listToMatrix l = asColumn $ fromList l 
-matrixTolist m = head $ toColumns m
+listToMatrix l = trans $ asColumn $ fromList l 
+matrixTolist m = toList $ head $ toColumns m
 buildSample x y = zip y' x'
   where
     x' = map toList (toRows x)
