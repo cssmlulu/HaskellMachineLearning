@@ -23,6 +23,7 @@ sumColumns m = fromRows $ [ sum $ toRows m ]
 
 listToMatrix l = trans $ asColumn $ fromList l 
 matrixTolist m = toList $ head $ toColumns m
+matrixToVecList m = map (V.fromList . toList) $ toColumns $ trans m
 buildSample x y = zip y' x'
   where
     x' = map toList (toRows x)

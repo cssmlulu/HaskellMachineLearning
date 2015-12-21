@@ -2,6 +2,9 @@ import qualified Data.Map as M
 import qualified Data.List as L
 import qualified Data.Vector as V
 import Control.Parallel.Strategies as Strategies
+import Numeric.LinearAlgebra
+
+matrixToVecList m = map (V.fromList . toList) $ toColumns $ trans m
 
 
 type Point = V.Vector Double
